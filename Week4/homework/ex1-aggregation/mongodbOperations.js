@@ -22,7 +22,7 @@ const getCountryPopulationByYear = async (country) => {
       }
     },
     {
-      $sort: { _id: 1 } 
+      $sort: { _id: 1 }
     }
   ]).toArray();
 
@@ -31,7 +31,8 @@ const getCountryPopulationByYear = async (country) => {
 };
 
 // Function to retrieve continent information for a given Year and Age field
-const getContinentInformationByYearAndAge = async (year, age) => {
+
+const getAllContinentInformationByYearAndAge = async (year, age) => {
   const client = new MongoClient(process.env.MONGODB_URL);
   await client.connect();
 
@@ -44,11 +45,9 @@ const getContinentInformationByYearAndAge = async (year, age) => {
     },
     {
       $addFields: {
-        TotalPopulation: { $add: ["$M", "$F"] }
+        TotalPopulation: { $add: ["$M", "$F"] },
+        Country: "$Country",
       }
-    },
-    {
-      $sort: { _id: 1 } 
     }
   ]).toArray();
 
@@ -62,7 +61,7 @@ getCountryPopulationByYear("Netherlands").then((result) => {
   console.log(result);
 });
 
-getContinentInformationByYearAndAge(2020, "100+").then((result) => {
+getAllContinentInformationByYearAndAge(2020, "100+").then((result) => {
   console.log("Continent information for 2020 and Age 100+:");
   console.log(result);
 });
