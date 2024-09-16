@@ -30,8 +30,7 @@ const getCountryPopulationByYear = async (country) => {
   return result;
 };
 
-// Function to retrieve continent information for a given Year and Age field
-
+// Update getAllContinentInformationByYearAndAge function to find documents based on provided year and age
 const getAllContinentInformationByYearAndAge = async (year, age) => {
   const client = new MongoClient(process.env.MONGODB_URL);
   await client.connect();
@@ -41,12 +40,21 @@ const getAllContinentInformationByYearAndAge = async (year, age) => {
 
   const result = await collection.aggregate([
     {
-      $match: { Year: year, Age: age }
+      $match: {
+        Year: year, Age: age, $and: [
+          { Country: { $regex: /^[A-Z]+$/ } },
+          { Country: { $not: { $regex: /world/i } } }]
+      }
     },
     {
-      $addFields: {
-        TotalPopulation: { $add: ["$M", "$F"] },
-        Country: "$Country",
+      $project: {
+        _id: 0,
+        Country: 1,
+        Year: 1,
+        Age: 1,
+        M: 1,
+        F: 1,
+        TotalPopulation: { $add: ["$M", "$F"] }
       }
     }
   ]).toArray();
